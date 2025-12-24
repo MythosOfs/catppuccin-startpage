@@ -36,7 +36,7 @@ const default_configuration = {
   keybindings: {
     "s": "search-bar",
   },
-  disabled: [],
+  disabled: ["current-time"],
   localIcons: true,
   localFonts: true,
   fastlink: "https://www.claude.ai",
