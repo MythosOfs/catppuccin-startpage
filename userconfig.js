@@ -17,19 +17,19 @@ const default_configuration = {
     format: "k:i p",
     icon_color: palette.maroon,
   },
-  additionalClocks: [
-    {
-      label: "UA",
-      timezone: "Europe/Kyiv",
-      format: "h:i",
-      icon_color: palette.peach,
-    },
-  ],
+  // additionalClocks: [
+  //   {
+  //     label: "UA",
+  //     timezone: "Europe/Kyiv",
+  //     format: "h:i",
+  //     icon_color: palette.peach,
+  //   },
+  // ],
   search: {
     engines: {
       p: ["https://www.perplexity.ai/search/?q=", "PerplexityAI"],
       d: ["https://duckduckgo.com/?q=", "DuckDuckGo"],
-      k: ["https://kagi.com/search?q=%s", "Kagi"]
+      k: ["https://kagi.com/search?q=", "Kagi"]
     },
     default: "k",
   },
@@ -44,17 +44,23 @@ const default_configuration = {
   tabs: [
     {
       name: "myself",
-      background_url: "src/img/banners/banner_09.gif",
+      background_url: "src/img/banners/banner_03.gif",
       categories: [
         {
           name: "bookmarks",
           links: [
-            // {
-            //   name: "example",
-            //   url: "https://example.com",
-            //   icon: "bookmark",
-            //   icon_color: palette.green,
-            // },
+            {
+              name: "fmhy",
+              url: "https://fmhy.net",
+              icon: "list-search",
+              icon_color: palette.green,
+            },
+            {
+              name: "torrentleech",
+              url: "https://torrentleech.org",
+              icon: "download",
+              icon_color: palette.peach,
+            },
           ],
         },
         {
@@ -113,7 +119,7 @@ const default_configuration = {
     },
     {
       name: "dev",
-      background_url: "src/img/banners/banner_07.gif",
+      background_url: "src/img/banners/banner_15.gif",
       categories: [
         {
           name: "development",
@@ -159,7 +165,7 @@ const default_configuration = {
     },
     {
       name: "chi ll",
-      background_url: "src/img/banners/banner_08.gif",
+      background_url: "src/img/banners/banner_11.gif",
       categories: [
         {
           name: "social media",
