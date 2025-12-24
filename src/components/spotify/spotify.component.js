@@ -323,19 +323,8 @@ class SpotifyPlayer extends Component {
    * Handle login button click
    */
   handleLogin() {
-    console.log('=== SPOTIFY LOGIN DEBUG ===');
-    console.log('handleLogin called');
-    console.log('SpotifyApi:', SpotifyApi);
-    console.log('CLIENT_ID:', SpotifyApi.CLIENT_ID);
-
     const authUrl = SpotifyApi.getAuthUrl();
-    console.log('Auth URL:', authUrl);
-
-    // Delay redirect so you can see the logs
-    alert('Check console! Redirecting in 3 seconds...\n\nAuth URL: ' + authUrl);
-    setTimeout(() => {
-      window.location.href = authUrl;
-    }, 3000);
+    window.location.href = authUrl;
   }
 
   /**
