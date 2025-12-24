@@ -326,6 +326,10 @@ class Statusbar extends Component {
    */
   activateByKey(key) {
     if (key < 0) return;
+    // Validate that the tab exists
+    if (!this.refs.tabs || !this.refs.tabs[key] || !this.externalRefs.categories || !this.externalRefs.categories[key]) {
+      return;
+    }
     this.currentTabIndex = key;
 
     this.activate(this.refs.tabs, this.refs.tabs[key]);
