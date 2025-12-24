@@ -45,9 +45,14 @@ body {
 
 tabs-list {
   position: relative;
-  width: 100%;
+  flex: 1;
   height: 100%;
   background-repeat: no-repeat;
   background-size: cover;
   background-color: var(--bg);
+}
+
+rss-reader {
+  position: relative;
+  height: 100%;
 }

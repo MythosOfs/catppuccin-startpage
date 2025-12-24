@@ -41,6 +41,25 @@ const default_configuration = {
   localFonts: true,
   fastlink: "https://www.claude.ai",
   openLastVisitedTab: true,
+  rssFeedMaxItems: 10,
+  rssFeeds: [
+    {
+      name: "Heise News",
+      url: "https://www.heise.de/rss/heise-atom.xml"
+    },
+    {
+      name: "Golem.de",
+      url: "https://rss.golem.de/rss.php?feed=ATOM1.0"
+    },
+    {
+      name: "Heise Developer",
+      url: "https://www.heise.de/developer/rss/news-atom.xml"
+    },
+    {
+      name: "Heise Security",
+      url: "https://www.heise.de/security/rss/news-atom.xml"
+    }
+  ],
   tabs: [
     {
       name: "myself",
