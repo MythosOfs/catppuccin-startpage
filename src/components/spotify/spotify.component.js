@@ -323,7 +323,10 @@ class SpotifyPlayer extends Component {
    * Handle login button click
    */
   handleLogin() {
-    window.location.href = SpotifyApi.getAuthUrl();
+    console.log('handleLogin called');
+    const authUrl = SpotifyApi.getAuthUrl();
+    console.log('Auth URL:', authUrl);
+    window.location.href = authUrl;
   }
 
   /**
