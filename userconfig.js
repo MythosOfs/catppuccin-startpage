@@ -41,6 +41,8 @@ const default_configuration = {
   localFonts: true,
   fastlink: "https://www.claude.ai",
   openLastVisitedTab: true,
+  // Spotify Client ID - Get this from https://developer.spotify.com/dashboard
+  spotifyClientId: "6c129ccfdfc94390b2c234542cb75b62",
   rssFeedMaxItems: 10,
   rssFeeds: [
     {

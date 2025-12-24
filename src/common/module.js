@@ -9,6 +9,7 @@ const components = {
   "weather-forecast": Weather,
   "tabs-list": Tabs,
   "rss-reader": RSSReader,
+  "spotify-player": SpotifyPlayer,
 };
 
 // Register each component as a custom element if it's not disabled

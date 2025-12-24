@@ -110,6 +110,13 @@ class Config {
       else if (this.storage.hasValue(setting)) this[setting] = this.storage.get(setting);
       else this[setting] = this.defaults[setting];
     });
+
+    // Also include any custom config properties that aren't in defaults
+    Object.keys(this.config).forEach((setting) => {
+      if (!(setting in this.defaults) && setting !== 'overrideStorage') {
+        this[setting] = this.config[setting];
+      }
+    });
   }
 
   /**

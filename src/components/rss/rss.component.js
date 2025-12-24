@@ -3,7 +3,11 @@
  * Displays RSS feeds with dropdown selector
  */
 class RSSReader extends Component {
-  refs = {};
+  refs = {
+    feedSelector: '[data-ref="feedSelector"]',
+    feedTitle: '[data-ref="feedTitle"]',
+    feedItems: '[data-ref="feedItems"]'
+  };
 
   constructor() {
     super();
@@ -29,19 +33,28 @@ class RSSReader extends Component {
   style() {
     return `
       rss-reader {
-        display: block;
-        width: 350px;
-        height: 100%;
-        background: ${CONFIG.palette.mantle};
-        border-left: 2px solid ${CONFIG.palette.surface0};
-        overflow: hidden;
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+        background: transparent;
+        pointer-events: none;
+      }
+
+      rss-reader * {
+        pointer-events: auto;
       }
 
       .rss-container {
         display: flex;
         flex-direction: column;
+        width: 350px;
         height: 100%;
+        background: ${CONFIG.palette.mantle};
+        border-radius: 0 8px 8px 0;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
         padding: 20px;
+        overflow: hidden;
+        overscroll-behavior: contain;
       }
 
       .rss-header {
@@ -76,7 +89,7 @@ class RSSReader extends Component {
 
       .rss-items {
         flex: 1;
-        overflow-y: auto;
+        overflow-y: scroll;
         overflow-x: hidden;
       }
 
@@ -170,7 +183,10 @@ class RSSReader extends Component {
    * Component template
    */
   template() {
-    if (!this.feeds || this.feeds.length === 0) {
+    // Check CONFIG directly instead of relying on this.feeds
+    const feeds = (typeof CONFIG !== 'undefined' && CONFIG.rssFeeds) ? CONFIG.rssFeeds : [];
+
+    if (!feeds || feeds.length === 0) {
       return `
         <div class="rss-container">
           <div class="rss-empty">No RSS feeds configured</div>
@@ -182,7 +198,7 @@ class RSSReader extends Component {
       <div class="rss-container">
         <div class="rss-header">
           <select class="rss-dropdown" data-ref="feedSelector">
-            ${this.feeds.map((feed, index) => `
+            ${feeds.map((feed, index) => `
               <option value="${index}" ${index === this.currentFeedIndex ? 'selected' : ''}>
                 ${feed.name}
               </option>
@@ -202,7 +218,13 @@ class RSSReader extends Component {
    */
   renderFeedItems() {
     const container = this.refs.feedItems;
-    if (!container || !this.feedData) return;
+    if (!container) {
+      return;
+    }
+
+    if (!this.feedData) {
+      return;
+    }
 
     if (this.feedData.items.length === 0) {
       container.innerHTML = '<div class="rss-empty">No items in this feed</div>';
@@ -225,10 +247,14 @@ class RSSReader extends Component {
    * Loads current feed
    */
   async loadFeed() {
-    if (!this.feeds || this.feeds.length === 0) return;
+    if (!this.feeds || this.feeds.length === 0) {
+      return;
+    }
 
     const currentFeed = this.feeds[this.currentFeedIndex];
-    if (!currentFeed) return;
+    if (!currentFeed) {
+      return;
+    }
 
     try {
       this.feedData = await RSSApi.fetchFeed(currentFeed.url, this.maxItems);
@@ -266,6 +292,21 @@ class RSSReader extends Component {
       if (this.refs.feedSelector) {
         this.refs.feedSelector.addEventListener('change', (e) => this.onFeedChange(e));
       }
+
+      // Prevent wheel events from bubbling to parent when scrolling RSS items
+      if (this.refs.feedItems) {
+        this.refs.feedItems.addEventListener('wheel', (e) => {
+          const target = e.currentTarget;
+          const atTop = target.scrollTop === 0;
+          const atBottom = target.scrollTop + target.clientHeight >= target.scrollHeight;
+
+          // Only stop propagation if we're not at scroll boundaries
+          if ((e.deltaY < 0 && !atTop) || (e.deltaY > 0 && !atBottom)) {
+            e.stopPropagation();
+          }
+        }, { passive: false });
+      }
+
       this.loadFeed();
     });
   }
