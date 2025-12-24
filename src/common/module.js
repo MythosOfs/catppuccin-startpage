@@ -8,6 +8,7 @@ const components = {
   "current-time": Clock,
   "weather-forecast": Weather,
   "tabs-list": Tabs,
+  "rss-reader": RSSReader,
 };
 
 // Register each component as a custom element if it's not disabled
