@@ -322,8 +322,8 @@ class SpotifyPlayer extends Component {
   /**
    * Handle login button click
    */
-  handleLogin() {
-    const authUrl = SpotifyApi.getAuthUrl();
+  async handleLogin() {
+    const authUrl = await SpotifyApi.getAuthUrl();
     window.location.href = authUrl;
   }
 
@@ -403,12 +403,18 @@ class SpotifyPlayer extends Component {
     if (typeof CONFIG !== 'undefined' && CONFIG.spotifyClientId && CONFIG.spotifyClientId !== 'YOUR_CLIENT_ID_HERE') {
       SpotifyApi.init(CONFIG.spotifyClientId);
 
-      // Check for access token in URL (after OAuth redirect)
-      const token = SpotifyApi.getAccessTokenFromUrl();
-      if (token) {
-        SpotifyApi.saveToken(token);
-        // Clean up URL
-        window.history.replaceState({}, document.title, window.location.pathname);
+      // Check for authorization code in URL (after OAuth redirect)
+      const code = SpotifyApi.getAuthCodeFromUrl();
+      if (code) {
+        try {
+          // Exchange code for access token
+          const tokenData = await SpotifyApi.exchangeCodeForToken(code);
+          SpotifyApi.saveToken(tokenData.access_token, tokenData.expires_in);
+          // Clean up URL
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } catch (error) {
+          console.error('Error exchanging code for token:', error);
+        }
       }
 
       // Check authentication status

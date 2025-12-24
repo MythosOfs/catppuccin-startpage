@@ -1,6 +1,7 @@
 /**
  * Spotify API handler
  * Handles authentication and playback control using Spotify Web API
+ * Uses Authorization Code Flow with PKCE (no client secret required)
  */
 class SpotifyApi {
   static CLIENT_ID = null;
@@ -19,15 +20,48 @@ class SpotifyApi {
   }
 
   /**
-   * Generate authorization URL for Spotify OAuth
-   * @returns {string} Authorization URL
+   * Generate a random string for PKCE code verifier
+   * @param {number} length - Length of the string
+   * @returns {string} Random string
    */
-  static getAuthUrl() {
+  static generateRandomString(length) {
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const values = crypto.getRandomValues(new Uint8Array(length));
+    return values.reduce((acc, x) => acc + possible[x % possible.length], '');
+  }
+
+  /**
+   * Generate SHA256 hash for PKCE code challenge
+   * @param {string} plain - Plain text to hash
+   * @returns {Promise<string>} Base64 URL encoded hash
+   */
+  static async sha256(plain) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(plain);
+    const hash = await crypto.subtle.digest('SHA-256', data);
+    return btoa(String.fromCharCode(...new Uint8Array(hash)))
+      .replace(/=/g, '')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_');
+  }
+
+  /**
+   * Generate authorization URL for Spotify OAuth with PKCE
+   * @returns {Promise<string>} Authorization URL
+   */
+  static async getAuthUrl() {
+    const codeVerifier = this.generateRandomString(64);
+    localStorage.setItem('spotify_code_verifier', codeVerifier);
+
+    const codeChallenge = await this.sha256(codeVerifier);
+
     const params = new URLSearchParams({
       client_id: this.CLIENT_ID,
-      response_type: 'token',
+      response_type: 'code',
       redirect_uri: this.REDIRECT_URI,
       scope: this.SCOPES.join(' '),
+      code_challenge_method: 'S256',
+      code_challenge: codeChallenge,
       show_dialog: false
     });
 
@@ -35,8 +69,51 @@ class SpotifyApi {
   }
 
   /**
-   * Extract access token from URL hash after OAuth redirect
+   * Extract authorization code from URL after OAuth redirect
+   * @returns {string|null} Authorization code or null
+   */
+  static getAuthCodeFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('code');
+  }
+
+  /**
+   * Exchange authorization code for access token
+   * @param {string} code - Authorization code
+   * @returns {Promise<object>} Token response
+   */
+  static async exchangeCodeForToken(code) {
+    const codeVerifier = localStorage.getItem('spotify_code_verifier');
+
+    const params = new URLSearchParams({
+      client_id: this.CLIENT_ID,
+      grant_type: 'authorization_code',
+      code: code,
+      redirect_uri: this.REDIRECT_URI,
+      code_verifier: codeVerifier
+    });
+
+    const response = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: params.toString()
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to exchange code for token');
+    }
+
+    const data = await response.json();
+    localStorage.removeItem('spotify_code_verifier');
+    return data;
+  }
+
+  /**
+   * Extract access token from URL hash after OAuth redirect (legacy)
    * @returns {string|null} Access token or null
+   * @deprecated Use getAuthCodeFromUrl and exchangeCodeForToken instead
    */
   static getAccessTokenFromUrl() {
     const hash = window.location.hash.substring(1);
