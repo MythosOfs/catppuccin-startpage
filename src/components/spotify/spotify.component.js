@@ -420,8 +420,14 @@ class SpotifyPlayer extends Component {
     await this.render();
 
     // Add event listeners
-    if (!this.isAuthenticated && this.refs.loginButton) {
-      this.refs.loginButton.addEventListener('click', () => this.handleLogin());
+    if (!this.isAuthenticated) {
+      const loginButton = this.shadow.querySelector('[data-ref="loginButton"]');
+      if (loginButton) {
+        loginButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.handleLogin();
+        });
+      }
     }
 
     if (this.isAuthenticated) {
