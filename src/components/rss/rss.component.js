@@ -7,10 +7,20 @@ class RSSReader extends Component {
 
   constructor() {
     super();
-    this.feeds = CONFIG.rssFeeds || [];
+    this.feeds = [];
     this.currentFeedIndex = 0;
     this.feedData = null;
-    this.maxItems = CONFIG.rssFeedMaxItems || 10;
+    this.maxItems = 10;
+  }
+
+  /**
+   * Initialize feeds from config
+   */
+  initFeeds() {
+    if (typeof CONFIG !== 'undefined') {
+      this.feeds = CONFIG.rssFeeds || [];
+      this.maxItems = CONFIG.rssFeedMaxItems || 10;
+    }
   }
 
   /**
@@ -251,6 +261,7 @@ class RSSReader extends Component {
    * Component connected callback
    */
   connectedCallback() {
+    this.initFeeds();
     this.render().then(() => {
       if (this.refs.feedSelector) {
         this.refs.feedSelector.addEventListener('change', (e) => this.onFeedChange(e));
